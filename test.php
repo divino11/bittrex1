@@ -32,118 +32,52 @@ while ($row = mysqli_fetch_array($result)) {
 </head>
 <body>
 <div class="container">
-    <button class="graph_btn btn btn-info"><a class="graph" href="graph.php" target="_blank">График цен</a></button>
-    <form action="index.php" method="post" class="formOrder">
+    <form action="test.php" method="post" class="formOrder">
         <?php
         require 'func/config.php';
         require_once 'func/functions.php';
         $buyOrSell = $_POST['buyOrSell'];
-        $allPrice = 0;
         if ($buyOrSell == "buy") {
-            $sum1 = 0;
-            $sql = mysqli_query($link,"TRUNCATE TABLE `bitGraphLast`");
             $dataNumber = $_POST['selectColumn'];
             $_SESSION['file'] = $dataNumber;
             $count = $_POST['count'];
-            $_SESSION['countBTC'] = $count;
             $file = fopen('json/' . $dataNumber . '.json', "r");
             $getJSON = stream_get_contents($file);
             $json = json_decode($getJSON);
+            $sql = mysqli_query($link,"TRUNCATE TABLE `bitGraph`");
             foreach ($json as $item) {
-                if ($dataNumber == "data1") {
-                    $rate1 = lastPrice($item);
-                    $counts1 = ($count / $_SESSION['i100']) * 0.95;
-                    $counts = sprintf('%.8f', $counts1);
-                    $_SESSION['count'] = $counts;
-                    $price1 = $rate1 / 0.95;
-                    $price = sprintf('%.8f', $price1);
-                    BuyOrSell($buyOrSell, $item, $counts, $price);
-                } elseif ($dataNumber == "data2") {
-                    $_SESSION['countBTC'] = $count;
-                    $rate2 = lastPrice($item);
-                    $counts2 = ($count / $_SESSION['i200']) * 0.95;
-                    $counts = sprintf('%.8f', $counts2);
-                    $_SESSION['count'] = $counts;
-                    $price2 = $rate2 / 0.95;
-                    $price = sprintf('%.8f', $price2);
-                    BuyOrSell($buyOrSell, $item, $counts, $price);
-                } elseif ($dataNumber == "data3") {
-                    $_SESSION['countBTC'] = $count;
-                    $rate3 = lastPrice($item);
-                    $counts3 = ($count / $_SESSION['i500']) * 0.95;
-                    $counts = sprintf('%.8f', $counts3);
-                    $_SESSION['count'] = $counts;
-                    $price3 = $rate3 / 0.95;
-                    $price = sprintf('%.8f', $price3);
-                    BuyOrSell($buyOrSell, $item, $counts, $price);
-                } elseif ($dataNumber == "data4") {
-                    $_SESSION['countBTC'] = $count;
+                if ($dataNumber == "data4") {
                     $rate4 = lastPrice($item);
+                    $_SESSION['i1000'];
                     $counts4 = ($count / $_SESSION['i1000']) * 0.95;
                     $counts = sprintf('%.8f', $counts4);
                     $_SESSION['count'] = $counts;
                     $price4 = $rate4 / 0.95;
                     $price = sprintf('%.8f', $price4);
                     BuyOrSell($buyOrSell, $item, $counts, $price);
+                    mysqli_set_charset($link, 'utf8');
+                    $sql = mysqli_query($link, "INSERT INTO `bitGraph` (`namePair`, `price`) 
+                        VALUES ('$item', '$price')");
                 }
-                    $multiplyPrice = $counts * $price;
-                    $sum1 += $multiplyPrice;
             }
-            $sum1 = $sum1 * 100;
-            $sum1 = sprintf('%.9f', $sum1);
-            $sql = mysqli_query($link, "INSERT INTO `bitGraphLast` (`lastPrice`) 
-                        VALUES ('$sum1')");
         } elseif ($buyOrSell == "sell") {
-            $sum1 = 0;
-            $sql = mysqli_query($link,"TRUNCATE TABLE `bitGraphLast`");
+            $sql = mysqli_query($link,"TRUNCATE TABLE `bitGraph`");
             $dataNumber = $_POST['selectColumn'];
-            $_SESSION['file'] = $dataNumber;
             $count = $_POST['count'];
-            $_SESSION['countBTC'] = $count;
             $file = fopen('json/' . $dataNumber . '.json', "r");
             $getJSON = stream_get_contents($file);
             $json = json_decode($getJSON);
             foreach ($json as $item) {
-                if ($dataNumber == "data1") {
-                    $rate1 = lastPrice($item);
-                    $counts1 = ($count / $_SESSION['i100']) * 0.95;
-                    $counts = sprintf('%.8f', $counts1);
-                    $_SESSION['count'] = $counts;
-                    $price1 = $rate1 * 0.95;
-                    $price = sprintf('%.8f', $price1);
-                    BuyOrSell($buyOrSell, $item, $counts, $price);
-                } elseif ($dataNumber == "data2") {
-                    $rate2 = lastPrice($item);
-                    $counts2 = ($count / $_SESSION['i200']) * 0.95;
-                    $counts = sprintf('%.8f', $counts2);
-                    $_SESSION['count'] = $counts;
-                    $price2 = $rate2 * 0.95;
-                    $price = sprintf('%.8f', $price2);
-                    BuyOrSell($buyOrSell, $item, $counts, $price);
-                } elseif ($dataNumber == "data3") {
-                    $rate3 = lastPrice($item);
-                    $counts3 = ($count / $_SESSION['i500']) * 0.95;
-                    $counts = sprintf('%.8f', $counts3);
-                    $_SESSION['count'] = $counts;
-                    $price3 = $rate3 * 0.95;
-                    $price = sprintf('%.8f', $price3);
-                    BuyOrSell($buyOrSell, $item, $counts, $price);
-                } elseif ($dataNumber == "data4") {
+                if ($dataNumber == "data4") {
                     $rate4 = lastPrice($item);
+                    $_SESSION['i1000'];
                     $counts4 = ($count / $_SESSION['i1000']) * 0.95;
                     $counts = sprintf('%.8f', $counts4);
-                    $_SESSION['count'] = $counts;
                     $price4 = $rate4 * 0.95;
                     $price = sprintf('%.8f', $price4);
                     BuyOrSell($buyOrSell, $item, $counts, $price);
                 }
-                $multiplyPrice = $counts * $price;
-                $sum1 += $multiplyPrice;
             }
-            $sum1 = $sum1 * 100;
-            $sum1 = sprintf('%.9f', $sum1);
-            $sql = mysqli_query($link, "INSERT INTO `bitGraphLast` (`lastPrice`) 
-                        VALUES ('$sum1')");
         }
         ?>
         <select name="buyOrSell" class="selectpicker">
@@ -178,7 +112,7 @@ while ($row = mysqli_fetch_array($result)) {
 <div id="container2"></div>
 <div id="container3"></div>
 <div id="container4"></div>
-<pre id="data1" hidden>Date,0 - 100
+<pre id="data1" hidden>Date,Construction output
     <?php
     $arr = array_combine($time, $result1);
     foreach ($arr as $key => $value) {
@@ -188,7 +122,7 @@ while ($row = mysqli_fetch_array($result)) {
     }
     ?>
 </pre>
-<pre id="data2" hidden>Date,100 - 200
+<pre id="data2" hidden>Date,Construction output
     <?php
     $arr = array_combine($time, $result2);
     foreach ($arr as $key => $value) {
@@ -198,7 +132,7 @@ while ($row = mysqli_fetch_array($result)) {
     }
     ?>
 </pre>
-<pre id="data3" hidden>Date,200 - 500
+<pre id="data3" hidden>Date,Construction output
     <?php
     $arr = array_combine($time, $result3);
     foreach ($arr as $key => $value) {
@@ -208,7 +142,7 @@ while ($row = mysqli_fetch_array($result)) {
     }
     ?>
 </pre>
-<pre id="data4" hidden>Date,>500
+<pre id="data4" hidden>Date,Construction output
     <?php
     $arr = array_combine($time, $result4);
     foreach ($arr as $key => $value) {
@@ -306,5 +240,137 @@ while ($row = mysqli_fetch_array($result)) {
         }
     });
 </script>
+<!--<script>
+    Highcharts.chart('container2', {
+
+        title: {
+            text: '100 - 200'
+        },
+        yAxis: {
+            title: {
+                text: 'Change'
+            }
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle'
+        },
+
+        plotOptions: {
+            series: {
+                type: 'flag'
+            }
+        },
+
+        series: [{
+            name: 'value',
+            data: [<?php /*echo join($result2, ',') */ ?>]
+        }],
+
+        responsive: {
+            rules: [{
+                condition: {
+                    maxWidth: 500
+                },
+                chartOptions: {
+                    legend: {
+                        layout: 'horizontal',
+                        align: 'center',
+                        verticalAlign: 'bottom'
+                    }
+                }
+            }]
+        }
+    });
+</script>
+<script>
+    Highcharts.chart('container3', {
+
+        title: {
+            text: '200 - 500'
+        },
+        yAxis: {
+            title: {
+                text: 'Change'
+            }
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle'
+        },
+
+        plotOptions: {
+            series: {
+                type: 'flag'
+            }
+        },
+
+        series: [{
+            name: 'value',
+            data: [<?php /*echo join($result3, ',') */ ?>]
+        }],
+
+        responsive: {
+            rules: [{
+                condition: {
+                    maxWidth: 500
+                },
+                chartOptions: {
+                    legend: {
+                        layout: 'horizontal',
+                        align: 'center',
+                        verticalAlign: 'bottom'
+                    }
+                }
+            }]
+        }
+    });
+</script>
+<script>
+    Highcharts.chart('container4', {
+
+        title: {
+            text: '>500'
+        },
+        yAxis: {
+            title: {
+                text: 'Change'
+            }
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle'
+        },
+
+        plotOptions: {
+            series: {
+                type: 'flag'
+            }
+        },
+
+        series: [{
+            name: 'value',
+            data: [<?php /*echo join($result4, ',') */ ?>]
+        }],
+
+        responsive: {
+            rules: [{
+                condition: {
+                    maxWidth: 500
+                },
+                chartOptions: {
+                    legend: {
+                        layout: 'horizontal',
+                        align: 'center',
+                        verticalAlign: 'bottom'
+                    }
+                }
+            }]
+        }
+    });
+</script>-->
 </body>
 </html>

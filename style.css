@@ -1,0 +1,74 @@
+body {
+    background: url("bg.jpg") repeat;
+}
+#container1 {
+    width: 25%;
+    height: 45%;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+}
+
+#container2 {
+    width: 25%;
+    height: 45%;
+    position: absolute;
+    left: 25%;
+    bottom: 0;
+}
+
+#container3 {
+    width: 25%;
+    height: 45%;
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+}
+#container4 {
+    width: 25%;
+    height: 45%;
+    position: absolute;
+    left: 75%;
+    bottom: 0;
+}
+
+.formGraphic {
+    padding-left: 15px;
+    position: absolute;
+    left: 0;
+    bottom: 45%;
+}
+
+.formOrder {
+    padding-top: 13%;
+    text-align: center;
+}
+
+.input_field {
+    border: 0;
+    border-radius: 10px;
+    padding: 6px;
+}
+
+.selectpicker {
+    border-radius: 10px;
+    border: 0;
+    padding: 6px;
+}
+
+.graph {
+    color: #ffffff;
+    text-underline: none;
+    text-decoration: none;
+}
+
+.graph:hover {
+    text-decoration: none;
+    color: #ffffff;
+}
+
+.graph_btn {
+    position: absolute;
+    right: 1%;
+    bottom: 48%;
+}
