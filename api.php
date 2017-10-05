@@ -84,6 +84,7 @@ foreach ($obj->result as $value) {
         }
     }
 }
+
 echo "i100 = $i100, i200 = $i200, i500 = $i500, i1000 = $i1000<br>";
 echo "cумма процентов: " . $sumPercent100 . "<br>";
 echo "cумма процентов: " . $sumPercent200 . "<br>";
