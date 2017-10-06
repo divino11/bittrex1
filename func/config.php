@@ -1,3 +1,3 @@
 <?php
-$apikey = 'd12a7a6cc72b44d4916d592f810433ec';
-$apisecret = '7ed5926ef0484d53bb87ecc3ff4c3dd2';
+$apikey = 'c1fd9b2b9752490a98216fcd1f4faad9';
+$apisecret = 'ae61abe3c4c24d1084ae5810a351b652';

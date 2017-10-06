@@ -35,15 +35,23 @@ while ($row = mysqli_fetch_array($result)) {
     <button class="graph_btn btn btn-info"><a class="graph" href="graph.php" target="_blank">График цен</a></button>
     <form action="index.php" method="post" class="formOrder">
         <?php
+        require_once 'db/db.php';
         require 'func/config.php';
         require_once 'func/functions.php';
         $buyOrSell = $_POST['buyOrSell'];
         $allPrice = 0;
+        $sql = "SELECT * FROM `bitCount`";
+        $result = mysqli_query($link, $sql);
+        $row = mysqli_fetch_array($result);
+        $i100 = $row['i100'];
+        $i200 = $row['i200'];
+        $i500 = $row['i500'];
+        $i1000 = $row['i1000'];
         if ($buyOrSell == "buy") {
             $sum1 = 0;
             $sql = mysqli_query($link,"TRUNCATE TABLE `bitGraphLast`");
+            $sql = mysqli_query($link,"TRUNCATE TABLE `bitOpt`");
             $dataNumber = $_POST['selectColumn'];
-            $_SESSION['file'] = $dataNumber;
             $count = $_POST['count'];
             $_SESSION['countBTC'] = $count;
             $file = fopen('json/' . $dataNumber . '.json', "r");
@@ -52,36 +60,32 @@ while ($row = mysqli_fetch_array($result)) {
             foreach ($json as $item) {
                 if ($dataNumber == "data1") {
                     $rate1 = lastPrice($item);
-                    $counts1 = ($count / $_SESSION['i100']) * 0.95;
+                    $counts1 = ($count / $i100) * 0.95;
                     $counts = sprintf('%.8f', $counts1);
-                    $_SESSION['count'] = $counts;
                     $price1 = $rate1 / 0.95;
                     $price = sprintf('%.8f', $price1);
                     BuyOrSell($buyOrSell, $item, $counts, $price);
                 } elseif ($dataNumber == "data2") {
                     $_SESSION['countBTC'] = $count;
                     $rate2 = lastPrice($item);
-                    $counts2 = ($count / $_SESSION['i200']) * 0.95;
+                    $counts2 = ($count / $i200) * 0.95;
                     $counts = sprintf('%.8f', $counts2);
-                    $_SESSION['count'] = $counts;
                     $price2 = $rate2 / 0.95;
                     $price = sprintf('%.8f', $price2);
                     BuyOrSell($buyOrSell, $item, $counts, $price);
                 } elseif ($dataNumber == "data3") {
                     $_SESSION['countBTC'] = $count;
                     $rate3 = lastPrice($item);
-                    $counts3 = ($count / $_SESSION['i500']) * 0.95;
+                    $counts3 = ($count / $i500) * 0.95;
                     $counts = sprintf('%.8f', $counts3);
-                    $_SESSION['count'] = $counts;
                     $price3 = $rate3 / 0.95;
                     $price = sprintf('%.8f', $price3);
                     BuyOrSell($buyOrSell, $item, $counts, $price);
                 } elseif ($dataNumber == "data4") {
                     $_SESSION['countBTC'] = $count;
                     $rate4 = lastPrice($item);
-                    $counts4 = ($count / $_SESSION['i1000']) * 0.95;
+                    $counts4 = ($count / $i1000) * 0.95;
                     $counts = sprintf('%.8f', $counts4);
-                    $_SESSION['count'] = $counts;
                     $price4 = $rate4 / 0.95;
                     $price = sprintf('%.8f', $price4);
                     BuyOrSell($buyOrSell, $item, $counts, $price);
@@ -93,11 +97,13 @@ while ($row = mysqli_fetch_array($result)) {
             $sum1 = sprintf('%.9f', $sum1);
             $sql = mysqli_query($link, "INSERT INTO `bitGraphLast` (`lastPrice`) 
                         VALUES ('$sum1')");
+            $sql = mysqli_query($link, "INSERT INTO `bitOpt` (`data`, `count`) 
+                        VALUES ('$dataNumber', '$counts')");
         } elseif ($buyOrSell == "sell") {
             $sum1 = 0;
             $sql = mysqli_query($link,"TRUNCATE TABLE `bitGraphLast`");
+            $sql = mysqli_query($link,"TRUNCATE TABLE `bitOpt`");
             $dataNumber = $_POST['selectColumn'];
-            $_SESSION['file'] = $dataNumber;
             $count = $_POST['count'];
             $_SESSION['countBTC'] = $count;
             $file = fopen('json/' . $dataNumber . '.json', "r");
@@ -106,33 +112,29 @@ while ($row = mysqli_fetch_array($result)) {
             foreach ($json as $item) {
                 if ($dataNumber == "data1") {
                     $rate1 = lastPrice($item);
-                    $counts1 = ($count / $_SESSION['i100']) * 0.95;
+                    $counts1 = ($count / $i100) * 0.95;
                     $counts = sprintf('%.8f', $counts1);
-                    $_SESSION['count'] = $counts;
                     $price1 = $rate1 * 0.95;
                     $price = sprintf('%.8f', $price1);
                     BuyOrSell($buyOrSell, $item, $counts, $price);
                 } elseif ($dataNumber == "data2") {
                     $rate2 = lastPrice($item);
-                    $counts2 = ($count / $_SESSION['i200']) * 0.95;
+                    $counts2 = ($count / $i200) * 0.95;
                     $counts = sprintf('%.8f', $counts2);
-                    $_SESSION['count'] = $counts;
                     $price2 = $rate2 * 0.95;
                     $price = sprintf('%.8f', $price2);
                     BuyOrSell($buyOrSell, $item, $counts, $price);
                 } elseif ($dataNumber == "data3") {
                     $rate3 = lastPrice($item);
-                    $counts3 = ($count / $_SESSION['i500']) * 0.95;
+                    $counts3 = ($count / $i500) * 0.95;
                     $counts = sprintf('%.8f', $counts3);
-                    $_SESSION['count'] = $counts;
                     $price3 = $rate3 * 0.95;
                     $price = sprintf('%.8f', $price3);
                     BuyOrSell($buyOrSell, $item, $counts, $price);
                 } elseif ($dataNumber == "data4") {
                     $rate4 = lastPrice($item);
-                    $counts4 = ($count / $_SESSION['i1000']) * 0.95;
+                    $counts4 = ($count / $i1000) * 0.95;
                     $counts = sprintf('%.8f', $counts4);
-                    $_SESSION['count'] = $counts;
                     $price4 = $rate4 * 0.95;
                     $price = sprintf('%.8f', $price4);
                     BuyOrSell($buyOrSell, $item, $counts, $price);
@@ -144,6 +146,8 @@ while ($row = mysqli_fetch_array($result)) {
             $sum1 = sprintf('%.9f', $sum1);
             $sql = mysqli_query($link, "INSERT INTO `bitGraphLast` (`lastPrice`) 
                         VALUES ('$sum1')");
+            $sql = mysqli_query($link, "INSERT INTO `bitOpt` (`data`, `count`) 
+                        VALUES ('$dataNumber', '$counts')");
         }
         ?>
         <select name="buyOrSell" class="selectpicker">

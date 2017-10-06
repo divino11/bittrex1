@@ -36,4 +36,28 @@ function lastPrice($item)
     }
     return $lastPrice;
 }
+
+function apiCurl () {
+    global $apikey;
+    global $apisecret;
+    $nonce = time();
+    $uri = 'https://bittrex.com/api/v1.1/public/getmarketsummaries?apikey=' . $apikey . '&nonce=' . $nonce;
+    $sign = hash_hmac('sha512', $uri, $apisecret);
+    $ch = curl_init($uri);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('apisign:' . $sign));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $execResult = curl_exec($ch);
+    $obj = json_decode($execResult);
+    return $obj;
+}
+
+function writeDataToJson ($pairName, $this_dir, $data) {
+    $file = fopen($this_dir . '/json/' . $data . '.json', w);
+    $arrayApi[] = $pairName;
+    $res = json_encode($arrayApi);
+    file_put_contents($this_dir . '/json/' . $data . '.json', $res);
+    fclose($file);
+    unset($file);
+    echo "<br>";
+}
 ?>
