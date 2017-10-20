@@ -1,23 +1,95 @@
 <?php
 session_start();
 set_time_limit(0);
-//error_reporting(0);     //отображение ошибок на странице
+error_reporting(0);     //отображение ошибок на странице
 require_once 'db/db.php';
 mysqli_set_charset($link, 'utf8');
 $time = $_POST['period'];
+$countData = 0;
+if ($_POST['period'] == null) {
+    $sql = "SELECT * FROM `bit` WHERE date >= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 30 MINUTE)";
+} else
 $sql = "SELECT * FROM `bit` $time";
 $result = mysqli_query($link, $sql);
 $result1 = array();
 $result2 = array();
 $result3 = array();
 $result4 = array();
+$avgPrice1 = array();
+$avgPrice2 = array();
+$avgPrice3 = array();
+$avgPrice4 = array();
 $time = array();
 while ($row = mysqli_fetch_array($result)) {
     $result1[] = $row['result1'];
     $result2[] = $row['result2'];
     $result3[] = $row['result3'];
     $result4[] = $row['result4'];
+    $avgPrice1[] = $row['price1'];
+    $avgPrice2[] = $row['price2'];
+    $avgPrice3[] = $row['price3'];
+    $avgPrice4[] = $row['price4'];
     $time[] = $row['date'];
+}
+if (isset($_POST['dataBtn1'])) {
+    $sql = mysqli_query($link, "TRUNCATE TABLE `bitCountData`");
+    foreach ($_POST['dataPair'] as $itemData) {
+        $this_dir = dirname(__FILE__);
+        $countData++;
+        $file1 = fopen($this_dir . '/json/dataSelect.json', "w");
+        $arrayApi1[] = $itemData;
+        $res1 = json_encode($arrayApi1);
+        file_put_contents($this_dir . "/json/dataSelect.json", $res1);
+        fclose($file1);
+        unset($file1);
+    }
+    $sql = mysqli_query($link, "INSERT INTO `bitCountData` (`dataSelect`)
+                    VALUES ('$countData')");
+}
+if (isset($_POST['dataBtn2'])) {
+    $sql = mysqli_query($link, "TRUNCATE TABLE `bitCountData`");
+    foreach ($_POST['dataPair'] as $itemData) {
+        $this_dir = dirname(__FILE__);
+        $countData++;
+        $file1 = fopen($this_dir . '/json/dataSelect.json', "w");
+        $arrayApi1[] = $itemData;
+        $res1 = json_encode($arrayApi1);
+        file_put_contents($this_dir . "/json/dataSelect.json", $res1);
+        fclose($file1);
+        unset($file1);
+    }
+    $sql = mysqli_query($link, "INSERT INTO `bitCountData` (`dataSelect`)
+                    VALUES ('$countData')");
+}
+if (isset($_POST['dataBtn3'])) {
+    $sql = mysqli_query($link, "TRUNCATE TABLE `bitCountData`");
+    foreach ($_POST['dataPair'] as $itemData) {
+        $this_dir = dirname(__FILE__);
+        $countData++;
+        $file1 = fopen($this_dir . '/json/dataSelect.json', "w");
+        $arrayApi1[] = $itemData;
+        $res1 = json_encode($arrayApi1);
+        file_put_contents($this_dir . "/json/dataSelect.json", $res1);
+        fclose($file1);
+        unset($file1);
+    }
+    $sql = mysqli_query($link, "INSERT INTO `bitCountData` (`dataSelect`)
+                    VALUES ('$countData')");
+}
+if (isset($_POST['dataBtn4'])) {
+    $sql = mysqli_query($link, "TRUNCATE TABLE `bitCountData`");
+    foreach ($_POST['dataPair'] as $itemData) {
+        $this_dir = dirname(__FILE__);
+        $countData++;
+        $file1 = fopen($this_dir . '/json/dataSelect.json', "w");
+        $arrayApi1[] = $itemData;
+        $res1 = json_encode($arrayApi1);
+        file_put_contents($this_dir . "/json/dataSelect.json", $res1);
+        fclose($file1);
+        unset($file1);
+    }
+    $sql = mysqli_query($link, "INSERT INTO `bitCountData` (`dataSelect`)
+                    VALUES ('$countData')");
 }
 ?>
 <html>
@@ -40,148 +112,175 @@ while ($row = mysqli_fetch_array($result)) {
         require_once 'func/functions.php';
         $buyOrSell = $_POST['buyOrSell'];
         $allPrice = 0;
-        $sql = "SELECT * FROM `bitCount`";
+        $amount = 0;
+        $sum1 = 0;
+        $sql = "SELECT * FROM `bitCountData`";
         $result = mysqli_query($link, $sql);
         $row = mysqli_fetch_array($result);
-        $i100 = $row['i100'];
-        $i200 = $row['i200'];
-        $i500 = $row['i500'];
-        $i1000 = $row['i1000'];
+        $countNamePair = $row['dataSelect'];
         if ($buyOrSell == "buy") {
-            $sum1 = 0;
-            $sql = mysqli_query($link,"TRUNCATE TABLE `bitGraphLast`");
-            $sql = mysqli_query($link,"TRUNCATE TABLE `bitOpt`");
+            $sql = mysqli_query($link, "TRUNCATE TABLE `bitPercent`");
+            $sql = mysqli_query($link, "TRUNCATE TABLE `bitGraphLast`");
+            $sql = mysqli_query($link, "TRUNCATE TABLE `bitAmount`");
             $dataNumber = $_POST['selectColumn'];
             $count = $_POST['count'];
-            $_SESSION['countBTC'] = $count;
-            $file = fopen('json/' . $dataNumber . '.json', "r");
+            $file = fopen('json/dataSelect.json', "r");
             $getJSON = stream_get_contents($file);
             $json = json_decode($getJSON);
             foreach ($json as $item) {
-                if ($dataNumber == "data1") {
-                    $rate1 = lastPrice($item);
-                    $counts1 = ($count / $i100) * 0.95;
-                    $counts = sprintf('%.8f', $counts1);
-                    $price1 = $rate1 / 0.95;
-                    $price = sprintf('%.8f', $price1);
-                    BuyOrSell($buyOrSell, $item, $counts, $price);
-                } elseif ($dataNumber == "data2") {
-                    $_SESSION['countBTC'] = $count;
-                    $rate2 = lastPrice($item);
-                    $counts2 = ($count / $i200) * 0.95;
-                    $counts = sprintf('%.8f', $counts2);
-                    $price2 = $rate2 / 0.95;
-                    $price = sprintf('%.8f', $price2);
-                    BuyOrSell($buyOrSell, $item, $counts, $price);
-                } elseif ($dataNumber == "data3") {
-                    $_SESSION['countBTC'] = $count;
-                    $rate3 = lastPrice($item);
-                    $counts3 = ($count / $i500) * 0.95;
-                    $counts = sprintf('%.8f', $counts3);
-                    $price3 = $rate3 / 0.95;
-                    $price = sprintf('%.8f', $price3);
-                    BuyOrSell($buyOrSell, $item, $counts, $price);
-                } elseif ($dataNumber == "data4") {
-                    $_SESSION['countBTC'] = $count;
-                    $rate4 = lastPrice($item);
-                    $counts4 = ($count / $i1000) * 0.95;
-                    $counts = sprintf('%.8f', $counts4);
-                    $price4 = $rate4 / 0.95;
-                    $price = sprintf('%.8f', $price4);
-                    BuyOrSell($buyOrSell, $item, $counts, $price);
-                }
-                    $multiplyPrice = $counts * $price;
+                $rate = lastPrice($item);
+                $counts = ($count / $countNamePair);
+                $counts = sprintf('%.8f', $counts);
+                $price = $rate / 0.95;
+                $price = sprintf('%.8f', $price);
+                $amount = ($counts / $price);
+                $amount = sprintf('%.8f', $amount);
+                //BuyOrSell($buyOrSell, $item, $amount, $price);
+                /*$nonce = time();
+                $uri = 'https://bittrex.com/api/v1.1/market/' . $buyOrSell . 'limit?apikey=' . $apikey . '&nonce=' . $nonce . '&market=' . $item . '&quantity=' . $amount . '&rate=' . $price;
+                $sign = hash_hmac('sha512', $uri, $apisecret);
+                $ch = curl_init($uri);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, array('apisign:' . $sign));
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                $execResult = curl_exec($ch);
+                $obj = json_decode($execResult);*/
+                $error = BuyOrSell($buyOrSell, $item, $amount, $price)->{'message'};
+                echo $error;
+                if ("DUST_TRADE_DISALLOWED_MIN_VALUE_50K_SAT" != $error || "INSUFFICIENT_FUNDS" != $error || "QUANTITY_NOT_PROVIDED" != $error || "INVALID_MARKET" != $error) {
+                    $amountOnePercent = $amount * 0.01;
+                    $arr = [$item => $amountOnePercent];
+                    $this_dir = dirname(__FILE__);
+                    $file1 = fopen($this_dir . '/json/dataPercent.json', "w");
+                    $arrayApi1[] = $arr;
+                    $res1 = json_encode($arrayApi1);
+                    file_put_contents($this_dir . "/json/dataPercent.json", $res1);
+                    fclose($file1);
+                    unset($file1);
+                    $sql = mysqli_query($link, "INSERT INTO `bitAmount` (`amount`, `amountOnePercent`, `allBTC`) 
+                        VALUES ('$amount', '$amountOnePercent', '$count')");
+                    $multiplyPrice = $amount * $price;
                     $sum1 += $multiplyPrice;
-            }
-            $sum1 = $sum1 * 100;
-            $sum1 = sprintf('%.9f', $sum1);
-            $sql = mysqli_query($link, "INSERT INTO `bitGraphLast` (`lastPrice`) 
-                        VALUES ('$sum1')");
-            $sql = mysqli_query($link, "INSERT INTO `bitOpt` (`data`, `count`) 
-                        VALUES ('$dataNumber', '$counts')");
-        } elseif ($buyOrSell == "sell") {
-            $sum1 = 0;
-            $sql = mysqli_query($link,"TRUNCATE TABLE `bitGraphLast`");
-            $sql = mysqli_query($link,"TRUNCATE TABLE `bitOpt`");
-            $dataNumber = $_POST['selectColumn'];
-            $count = $_POST['count'];
-            $_SESSION['countBTC'] = $count;
-            $file = fopen('json/' . $dataNumber . '.json', "r");
-            $getJSON = stream_get_contents($file);
-            $json = json_decode($getJSON);
-            foreach ($json as $item) {
-                if ($dataNumber == "data1") {
-                    $rate1 = lastPrice($item);
-                    $counts1 = ($count / $i100) * 0.95;
-                    $counts = sprintf('%.8f', $counts1);
-                    $price1 = $rate1 * 0.95;
-                    $price = sprintf('%.8f', $price1);
-                    BuyOrSell($buyOrSell, $item, $counts, $price);
-                } elseif ($dataNumber == "data2") {
-                    $rate2 = lastPrice($item);
-                    $counts2 = ($count / $i200) * 0.95;
-                    $counts = sprintf('%.8f', $counts2);
-                    $price2 = $rate2 * 0.95;
-                    $price = sprintf('%.8f', $price2);
-                    BuyOrSell($buyOrSell, $item, $counts, $price);
-                } elseif ($dataNumber == "data3") {
-                    $rate3 = lastPrice($item);
-                    $counts3 = ($count / $i500) * 0.95;
-                    $counts = sprintf('%.8f', $counts3);
-                    $price3 = $rate3 * 0.95;
-                    $price = sprintf('%.8f', $price3);
-                    BuyOrSell($buyOrSell, $item, $counts, $price);
-                } elseif ($dataNumber == "data4") {
-                    $rate4 = lastPrice($item);
-                    $counts4 = ($count / $i1000) * 0.95;
-                    $counts = sprintf('%.8f', $counts4);
-                    $price4 = $rate4 * 0.95;
-                    $price = sprintf('%.8f', $price4);
-                    BuyOrSell($buyOrSell, $item, $counts, $price);
                 }
-                $multiplyPrice = $counts * $price;
-                $sum1 += $multiplyPrice;
             }
-            $sum1 = $sum1 * 100;
             $sum1 = sprintf('%.9f', $sum1);
             $sql = mysqli_query($link, "INSERT INTO `bitGraphLast` (`lastPrice`) 
                         VALUES ('$sum1')");
-            $sql = mysqli_query($link, "INSERT INTO `bitOpt` (`data`, `count`) 
-                        VALUES ('$dataNumber', '$counts')");
         }
         ?>
         <select name="buyOrSell" class="selectpicker">
-            <option value="">Покупка или продажа</option>
             <option value="buy">Покупка</option>
-            <option value="sell">Продажа</option>
-        </select>
-        <select name="selectColumn" class="selectpicker">
-            <option value="">Выберите колонку</option>
-            <option value="data1">0 - 100</option>
-            <option value="data2">100 - 200</option>
-            <option value="data3">200 - 500</option>
-            <option value="data4">>500</option>
         </select>
         <input type="text" name="count" class="input_field" placeholder="Количество в BTC (5)">
-        <button type="submit" class="btn btn-info">Выбрать</button>
+        <button type="submit" class="btn btn-info" name="mainFormBtn">Купить</button>
     </form>
     <form action="index.php" method="post" class="formGraphic">
         <select name="period">
-            <option value=" WHERE date >= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 30 MINUTE)">Последние 30 мин</option>
-            <option value=" WHERE date >= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 HOUR)">Последний час</option>
-            <option value=" WHERE date >= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 5 HOUR)">Последние 5 часов</option>
-            <option value=" WHERE date >= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 10 HOUR)">Последние 10 часов</option>
-            <option value=" WHERE date >= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 DAY)">Последние сутки</option>
-            <option value=" WHERE date >= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 7 DAY)">Последняя неделя</option>
-            <option value=" WHERE date >= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 30 DAY)">Последний месяц</option>
+            <option value=" WHERE date >= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 30 MINUTE) " selected>Последние 30 мин
+            </option>
+            <option value=" WHERE date >= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 HOUR) ">Последний час</option>
+            <option value=" WHERE date >= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 5 HOUR) ">Последние 5 часов</option>
+            <option value=" WHERE date >= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 10 HOUR) ">Последние 10 часов</option>
+            <option value=" WHERE date >= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 1 DAY) ">Последние сутки</option>
+            <option value=" WHERE date >= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 7 DAY) ">Последняя неделя</option>
+            <option value=" WHERE date >= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 30 DAY) ">Последний месяц</option>
         </select>
         <button class="btn btn-info">Выбрать</button>
     </form>
 </div>
-<div id="container1"></div>
-<div id="container2"></div>
-<div id="container3"></div>
-<div id="container4"></div>
+    <section class="graph1">
+    <div id="container1"></div>
+    <div id="container2"></div>
+    <div id="container3"></div>
+    <div id="container4"></div>
+    </section>
+    <div id="container5"></div>
+    <div id="container6"></div>
+    <div id="container7"></div>
+    <div id="container8"></div>
+<section class="namePair">
+    <div class="row">
+        <div class="col-md-3">
+            <form action="index.php" method="post">
+                    <?php
+                    require_once 'db/db.php';
+                    $sql = "SELECT * FROM bitData";
+                    $result = mysqli_query($link, $sql);
+                    while ($row = mysqli_fetch_array($result)) {
+                        $data = $row['data1'];
+                        $changePercent = $row['changePercent1'];
+                        if ($data != null) {
+                            echo "<div class='colorPairName'>";
+                            echo $data . "<input type='checkbox' name='dataPair[]' value='" . $data . "' checked>" . " " . round($changePercent, 2);
+                            echo "<br>";
+                            echo "</div>";
+                        }
+                    }
+                    ?>
+                <button type="submit" class="btn btn-info" name="dataBtn1">Выбрать</button>
+            </form>
+        </div>
+        <div class="col-md-3">
+            <form action="index.php" method="post">
+                    <?php
+                    require_once 'db/db.php';
+                    $sql = "SELECT * FROM bitData";
+                    $result = mysqli_query($link, $sql);
+                    while ($row = mysqli_fetch_array($result)) {
+                        $data = $row['data2'];
+                        $changePercent = $row['changePercent2'];
+                        if ($data != null) {
+                            echo "<div class='colorPairName'>";
+                            echo $data . "<input type='checkbox' name='dataPair[]' value='" . $data . "' checked>" . " " . round($changePercent, 2);
+                            echo "<br>";
+                            echo "</div>";
+                        }
+                    }
+                    ?>
+                <button type="submit" class="btn btn-info" name="dataBtn2">Выбрать</button>
+            </form>
+        </div>
+        <div class="col-md-3">
+            <form action="index.php" method="post">
+                    <?php
+                    require_once 'db/db.php';
+                    $sql = "SELECT * FROM bitData";
+                    $result = mysqli_query($link, $sql);
+                    while ($row = mysqli_fetch_array($result)) {
+                        $data = $row['data3'];
+                        $changePercent = $row['changePercent3'];
+                        if ($data != null) {
+                            echo "<div class='colorPairName'>";
+                            echo $data . "<input type='checkbox' name='dataPair[]' value='" . $data . "' checked>" . " " . round($changePercent, 2);
+                            echo "<br>";
+                            echo "</div>";
+                        }
+                    }
+                    ?>
+                <button type="submit" class="btn btn-info" name="dataBtn3">Выбрать</button>
+            </form>
+        </div>
+        <div class="col-md-3">
+            <form action="index.php" method="post">
+                    <?php
+                    require_once 'db/db.php';
+                    $sql = "SELECT * FROM bitData";
+                    $result = mysqli_query($link, $sql);
+                    while ($row = mysqli_fetch_array($result)) {
+                        $data = $row['data4'];
+                        $changePercent = $row['changePercent4'];
+                        if ($data != null) {
+                            echo "<div class='colorPairName'>";
+                            echo $data . "<input type='checkbox' name='dataPair[]' value='" . $data . "' checked>" . " " . round($changePercent, 2);
+                            echo "<br>";
+                            echo "</div>";
+                        }
+                    }
+                    ?>
+                <button type="submit" class="btn btn-info" name="dataBtn4">Выбрать</button>
+            </form>
+        </div>
+    </div>
+</section>
 <pre id="data1" hidden>Date,0 - 100
     <?php
     $arr = array_combine($time, $result1);
@@ -222,7 +321,47 @@ while ($row = mysqli_fetch_array($result)) {
     }
     ?>
 </pre>
-<script>
+<pre id="data5" hidden>LastPrice,0 - 100
+    <?php
+    $arr = array_combine($time, $avgPrice1);
+    foreach ($arr as $key => $value) {
+        echo $key;
+        echo ",";
+        echo $value . "\n";
+    }
+    ?>
+</pre>
+<pre id="data6" hidden>LastPrice,100 - 200
+    <?php
+    $arr = array_combine($time, $avgPrice2);
+    foreach ($arr as $key => $value) {
+        echo $key;
+        echo ",";
+        echo $value . "\n";
+    }
+    ?>
+</pre>
+<pre id="data7" hidden>LastPrice,200 - 500
+    <?php
+    $arr = array_combine($time, $avgPrice3);
+    foreach ($arr as $key => $value) {
+        echo $key;
+        echo ",";
+        echo $value . "\n";
+    }
+    ?>
+</pre>
+<pre id="data8" hidden>LastPrice,>500
+    <?php
+    $arr = array_combine($time, $avgPrice4);
+    foreach ($arr as $key => $value) {
+        echo $key;
+        echo ",";
+        echo $value . "\n";
+    }
+    ?>
+</pre>
+<script async>
     Highcharts.chart('container1', {
         data: {
             csv: document.getElementById('data1').innerHTML
@@ -244,7 +383,7 @@ while ($row = mysqli_fetch_array($result)) {
         }
     });
 </script>
-<script>
+<script async>
     Highcharts.chart('container2', {
         data: {
             csv: document.getElementById('data2').innerHTML
@@ -266,7 +405,7 @@ while ($row = mysqli_fetch_array($result)) {
         }
     });
 </script>
-<script>
+<script async>
     Highcharts.chart('container3', {
         data: {
             csv: document.getElementById('data3').innerHTML
@@ -288,7 +427,7 @@ while ($row = mysqli_fetch_array($result)) {
         }
     });
 </script>
-<script>
+<script async>
     Highcharts.chart('container4', {
         data: {
             csv: document.getElementById('data4').innerHTML
@@ -307,6 +446,94 @@ while ($row = mysqli_fetch_array($result)) {
         },
         title: {
             text: '>500'
+        }
+    });
+</script>
+<script async>
+    Highcharts.chart('container5', {
+        data: {
+            csv: document.getElementById('data5').innerHTML
+        },
+        yAxis: {
+            title: {
+                text: 'Price'
+            }
+        },
+        plotOptions: {
+            series: {
+                marker: {
+                    enabled: false
+                }
+            }
+        },
+        title: {
+            text: 'LastPrice 0 - 100'
+        }
+    });
+</script>
+<script async>
+    Highcharts.chart('container6', {
+        data: {
+            csv: document.getElementById('data6').innerHTML
+        },
+        yAxis: {
+            title: {
+                text: 'Price'
+            }
+        },
+        plotOptions: {
+            series: {
+                marker: {
+                    enabled: false
+                }
+            }
+        },
+        title: {
+            text: 'LastPrice 100 - 200'
+        }
+    });
+</script>
+<script async>
+    Highcharts.chart('container7', {
+        data: {
+            csv: document.getElementById('data7').innerHTML
+        },
+        yAxis: {
+            title: {
+                text: 'Price'
+            }
+        },
+        plotOptions: {
+            series: {
+                marker: {
+                    enabled: false
+                }
+            }
+        },
+        title: {
+            text: 'LastPrice 200 - 500'
+        }
+    });
+</script>
+<script async>
+    Highcharts.chart('container8', {
+        data: {
+            csv: document.getElementById('data8').innerHTML
+        },
+        yAxis: {
+            title: {
+                text: 'Price'
+            }
+        },
+        plotOptions: {
+            series: {
+                marker: {
+                    enabled: false
+                }
+            }
+        },
+        title: {
+            text: 'LastPrice >500'
         }
     });
 </script>

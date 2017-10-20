@@ -1,6 +1,12 @@
 body {
     background: url("bg.jpg") repeat;
 }
+
+.graph1 {
+    height: 70%;
+    width: 100%;
+}
+
 #container1 {
     width: 25%;
     height: 45%;
@@ -30,6 +36,37 @@ body {
     position: absolute;
     left: 75%;
     bottom: 0;
+}
+
+#container5 {
+    width: 25%;
+    height: 45%;
+    position: absolute;
+    left: 0;
+    margin-top: 1px;
+}
+
+#container6 {
+    width: 25%;
+    height: 45%;
+    position: absolute;
+    left: 25%;
+    margin-top: 1px;
+}
+
+#container7 {
+    width: 25%;
+    height: 45%;
+    position: absolute;
+    left: 50%;
+    margin-top: 1px;
+}
+#container8 {
+    width: 25%;
+    height: 45%;
+    position: absolute;
+    left: 75%;
+    margin-top: 1px;
 }
 
 .formGraphic {
@@ -71,4 +108,25 @@ body {
     position: absolute;
     right: 1%;
     bottom: 48%;
+}
+
+.formSellAll {
+    text-align: center;
+}
+
+.colorPairName {
+    color: #ffffff;
+}
+
+.namePair {
+    width: 100%;
+    margin-top: 41%;
+}
+
+.col-md-3 {
+    padding-left: 15px;
+}
+
+.aligncenter {
+    text-align: center;
 }
