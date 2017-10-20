@@ -135,15 +135,6 @@ if (isset($_POST['dataBtn4'])) {
                 $price = sprintf('%.8f', $price);
                 $amount = ($counts / $price);
                 $amount = sprintf('%.8f', $amount);
-                //BuyOrSell($buyOrSell, $item, $amount, $price);
-                /*$nonce = time();
-                $uri = 'https://bittrex.com/api/v1.1/market/' . $buyOrSell . 'limit?apikey=' . $apikey . '&nonce=' . $nonce . '&market=' . $item . '&quantity=' . $amount . '&rate=' . $price;
-                $sign = hash_hmac('sha512', $uri, $apisecret);
-                $ch = curl_init($uri);
-                curl_setopt($ch, CURLOPT_HTTPHEADER, array('apisign:' . $sign));
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                $execResult = curl_exec($ch);
-                $obj = json_decode($execResult);*/
                 $error = BuyOrSell($buyOrSell, $item, $amount, $price)->{'message'};
                 echo $error;
                 if ("DUST_TRADE_DISALLOWED_MIN_VALUE_50K_SAT" != $error || "INSUFFICIENT_FUNDS" != $error || "QUANTITY_NOT_PROVIDED" != $error || "INVALID_MARKET" != $error) {
