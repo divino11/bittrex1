@@ -9,7 +9,7 @@ $countData = 0;
 if ($_POST['period'] == null) {
     $sql = "SELECT * FROM `bit` WHERE date >= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 30 MINUTE)";
 } else
-$sql = "SELECT * FROM `bit` $time";
+    $sql = "SELECT * FROM `bit` $time";
 $result = mysqli_query($link, $sql);
 $result1 = array();
 $result2 = array();
@@ -19,6 +19,10 @@ $avgPrice1 = array();
 $avgPrice2 = array();
 $avgPrice3 = array();
 $avgPrice4 = array();
+$volume100 = array();
+$volume200 = array();
+$volume500 = array();
+$volume1000 = array();
 $time = array();
 while ($row = mysqli_fetch_array($result)) {
     $result1[] = $row['result1'];
@@ -29,8 +33,20 @@ while ($row = mysqli_fetch_array($result)) {
     $avgPrice2[] = $row['price2'];
     $avgPrice3[] = $row['price3'];
     $avgPrice4[] = $row['price4'];
+    $price1 = $row['price1'];
+    $price2 = $row['price2'];
+    $price3 = $row['price3'];
+    $price4 = $row['price4'];
+    $volume100[] = $row['volume1'];
+    $volume200[] = $row['volume2'];
+    $volume500[] = $row['volume3'];
+    $volume1000[] = $row['volume4'];
+    $countFromSQL = $row['amount'];
     $time[] = $row['date'];
+    $avgPrice = $price1 + $price2 + $price3 + $price4;
+    $avgSum[] = $avgPrice;
 }
+$str = "'" . implode("', '", $time) . "'";
 if (isset($_POST['dataBtn1'])) {
     $sql = mysqli_query($link, "TRUNCATE TABLE `bitCountData`");
     foreach ($_POST['dataPair'] as $itemData) {
@@ -90,6 +106,29 @@ if (isset($_POST['dataBtn4'])) {
     }
     $sql = mysqli_query($link, "INSERT INTO `bitCountData` (`dataSelect`)
                     VALUES ('$countData')");
+}
+if (isset($_POST['allNamePairBtn'])) {
+    $data1 = array();
+    $data2 = array();
+    $data3 = array();
+    $data4 = array();
+    $sql = "SELECT data1, data2, data3, data4 FROM bitData";
+    $result = mysqli_query($link, $sql);
+    while ($row = mysqli_fetch_array($result)) {
+        $data1[] = $row['data1'];
+        $data2[] = $row['data2'];
+        $data3[] = $row['data3'];
+        $data4[] = $row['data4'];
+    }
+    $allNamePair = array_merge($data1, $data2, $data3, $data4);
+    $allNamePair = array_diff($allNamePair, array(''));
+    $this_dir = dirname(__FILE__);
+    $file1 = fopen($this_dir . '/json/dataSelect.json', "w");
+    $arrayApi1 = $allNamePair;
+    $res1 = json_encode($arrayApi1);
+    file_put_contents($this_dir . "/json/dataSelect.json", $res1);
+    fclose($file1);
+    unset($file1);
 }
 ?>
 <html>
@@ -178,101 +217,127 @@ if (isset($_POST['dataBtn4'])) {
         <button class="btn btn-info">Выбрать</button>
     </form>
 </div>
-    <section class="graph1">
+<section class="graph1">
     <div id="container1"></div>
     <div id="container2"></div>
     <div id="container3"></div>
     <div id="container4"></div>
-    </section>
-    <div id="container5"></div>
-    <div id="container6"></div>
-    <div id="container7"></div>
-    <div id="container8"></div>
+</section>
+<div id="container5"></div>
+<div id="container6"></div>
+<div id="container7"></div>
+<div id="container8"></div>
+<div id="container9"></div>
+<div id="container10"></div>
+<div id="container11"></div>
+<div id="container12"></div>
+<div id="graphAllLastPrice"></div>
 <section class="namePair">
+    <form action="index.php" method="post">
+        <div class="aligncenter">
+        <button type="submit" class="btn btn-info" name="allNamePairBtn">Выбрать все валюты</button>
+        </div>
+    </form>
     <div class="row">
         <div class="col-md-3">
             <form action="index.php" method="post">
-                    <?php
-                    require_once 'db/db.php';
-                    $sql = "SELECT * FROM bitData";
-                    $result = mysqli_query($link, $sql);
-                    while ($row = mysqli_fetch_array($result)) {
-                        $data = $row['data1'];
-                        $changePercent = $row['changePercent1'];
-                        if ($data != null) {
-                            echo "<div class='colorPairName'>";
-                            echo $data . "<input type='checkbox' name='dataPair[]' value='" . $data . "' checked>" . " " . round($changePercent, 2);
-                            echo "<br>";
-                            echo "</div>";
-                        }
+                <?php
+                require_once 'db/db.php';
+                $sql = "SELECT * FROM bitData ORDER BY volume1 DESC";
+                $result = mysqli_query($link, $sql);
+                while ($row = mysqli_fetch_array($result)) {
+                    $data = $row['data1'];
+                    $changePercent = $row['changePercent1'];
+                    if ($data != null) {
+                        echo "<div class='colorPairName'>";
+                        echo $data . "<input type='checkbox' class='data1' name='dataPair[]' value='" . $data . "' checked>" . " " . round($changePercent, 2);
+                        echo "<br>";
+                        echo "</div>";
                     }
-                    ?>
+                }
+                ?>
+                <button type="button" onclick="$('.data1').prop('checked', false)" class="btn btn-info">Убрать все
+                    галочки
+                </button>
+                <br>
                 <button type="submit" class="btn btn-info" name="dataBtn1">Выбрать</button>
             </form>
         </div>
         <div class="col-md-3">
             <form action="index.php" method="post">
-                    <?php
-                    require_once 'db/db.php';
-                    $sql = "SELECT * FROM bitData";
-                    $result = mysqli_query($link, $sql);
-                    while ($row = mysqli_fetch_array($result)) {
-                        $data = $row['data2'];
-                        $changePercent = $row['changePercent2'];
-                        if ($data != null) {
-                            echo "<div class='colorPairName'>";
-                            echo $data . "<input type='checkbox' name='dataPair[]' value='" . $data . "' checked>" . " " . round($changePercent, 2);
-                            echo "<br>";
-                            echo "</div>";
-                        }
+                <?php
+                require_once 'db/db.php';
+                $sql = "SELECT * FROM bitData ORDER BY volume2 DESC";
+                $result = mysqli_query($link, $sql);
+                while ($row = mysqli_fetch_array($result)) {
+                    $data = $row['data2'];
+                    $changePercent = $row['changePercent2'];
+                    if ($data != null) {
+                        echo "<div class='colorPairName'>";
+                        echo $data . "<input type='checkbox' class='data2' name='dataPair[]' value='" . $data . "' checked>" . " " . round($changePercent, 2);
+                        echo "<br>";
+                        echo "</div>";
                     }
-                    ?>
+                }
+                ?>
+                <button type="button" onclick="$('.data2').prop('checked', false)" class="btn btn-info">Убрать все
+                    галочки
+                </button>
+                <br>
                 <button type="submit" class="btn btn-info" name="dataBtn2">Выбрать</button>
             </form>
         </div>
         <div class="col-md-3">
             <form action="index.php" method="post">
-                    <?php
-                    require_once 'db/db.php';
-                    $sql = "SELECT * FROM bitData";
-                    $result = mysqli_query($link, $sql);
-                    while ($row = mysqli_fetch_array($result)) {
-                        $data = $row['data3'];
-                        $changePercent = $row['changePercent3'];
-                        if ($data != null) {
-                            echo "<div class='colorPairName'>";
-                            echo $data . "<input type='checkbox' name='dataPair[]' value='" . $data . "' checked>" . " " . round($changePercent, 2);
-                            echo "<br>";
-                            echo "</div>";
-                        }
+                <?php
+                require_once 'db/db.php';
+                $sql = "SELECT * FROM bitData ORDER BY volume3 DESC";
+                $result = mysqli_query($link, $sql);
+                while ($row = mysqli_fetch_array($result)) {
+                    $data = $row['data3'];
+                    $changePercent = $row['changePercent3'];
+                    if ($data != null) {
+                        echo "<div class='colorPairName'>";
+                        echo $data . "<input type='checkbox' class='data3' name='dataPair[]' value='" . $data . "' checked>" . " " . round($changePercent, 2);
+                        echo "<br>";
+                        echo "</div>";
                     }
-                    ?>
+                }
+                ?>
+                <button type="button" onclick="$('.data3').prop('checked', false)" class="btn btn-info">Убрать все
+                    галочки
+                </button>
+                <br>
                 <button type="submit" class="btn btn-info" name="dataBtn3">Выбрать</button>
             </form>
         </div>
         <div class="col-md-3">
             <form action="index.php" method="post">
-                    <?php
-                    require_once 'db/db.php';
-                    $sql = "SELECT * FROM bitData";
-                    $result = mysqli_query($link, $sql);
-                    while ($row = mysqli_fetch_array($result)) {
-                        $data = $row['data4'];
-                        $changePercent = $row['changePercent4'];
-                        if ($data != null) {
-                            echo "<div class='colorPairName'>";
-                            echo $data . "<input type='checkbox' name='dataPair[]' value='" . $data . "' checked>" . " " . round($changePercent, 2);
-                            echo "<br>";
-                            echo "</div>";
-                        }
+                <?php
+                require_once 'db/db.php';
+                $sql = "SELECT * FROM bitData ORDER BY volume4 DESC";
+                $result = mysqli_query($link, $sql);
+                while ($row = mysqli_fetch_array($result)) {
+                    $data = $row['data4'];
+                    $changePercent = $row['changePercent4'];
+                    if ($data != null) {
+                        echo "<div class='colorPairName'>";
+                        echo $data . "<input type='checkbox' class='data4' name='dataPair[]' value='" . $data . "' checked>" . " " . round($changePercent, 2);
+                        echo "<br>";
+                        echo "</div>";
                     }
-                    ?>
+                }
+                ?>
+                <button type="button" onclick="$('.data4').prop('checked', false)" class="btn btn-info">Убрать все
+                    галочки
+                </button>
+                <br>
                 <button type="submit" class="btn btn-info" name="dataBtn4">Выбрать</button>
             </form>
         </div>
     </div>
 </section>
-<pre id="data1" hidden>Date,0 - 100
+<pre id="data1" hidden>Date,20 - 100
     <?php
     $arr = array_combine($time, $result1);
     foreach ($arr as $key => $value) {
@@ -312,7 +377,7 @@ if (isset($_POST['dataBtn4'])) {
     }
     ?>
 </pre>
-<pre id="data5" hidden>LastPrice,0 - 100
+<pre id="data5" hidden>LastPrice,20 - 100
     <?php
     $arr = array_combine($time, $avgPrice1);
     foreach ($arr as $key => $value) {
@@ -352,6 +417,46 @@ if (isset($_POST['dataBtn4'])) {
     }
     ?>
 </pre>
+<pre id="data9" hidden>Volume,20 - 100
+    <?php
+    $arr = array_combine($time, $volume100);
+    foreach ($arr as $key => $value) {
+        echo $key;
+        echo ",";
+        echo $value . "\n";
+    }
+    ?>
+</pre>
+<pre id="data10" hidden>Volume,100 - 200
+    <?php
+    $arr = array_combine($time, $volume200);
+    foreach ($arr as $key => $value) {
+        echo $key;
+        echo ",";
+        echo $value . "\n";
+    }
+    ?>
+</pre>
+<pre id="data11" hidden>Volume,200 - 500
+    <?php
+    $arr = array_combine($time, $volume500);
+    foreach ($arr as $key => $value) {
+        echo $key;
+        echo ",";
+        echo $value . "\n";
+    }
+    ?>
+</pre>
+<pre id="data12" hidden>Volume,>500
+    <?php
+    $arr = array_combine($time, $volume1000);
+    foreach ($arr as $key => $value) {
+        echo $key;
+        echo ",";
+        echo $value . "\n";
+    }
+    ?>
+</pre>
 <script async>
     Highcharts.chart('container1', {
         data: {
@@ -370,7 +475,7 @@ if (isset($_POST['dataBtn4'])) {
             }
         },
         title: {
-            text: '0 - 100'
+            text: '20 - 100'
         }
     });
 </script>
@@ -458,7 +563,7 @@ if (isset($_POST['dataBtn4'])) {
             }
         },
         title: {
-            text: 'LastPrice 0 - 100'
+            text: 'LastPrice 20 - 100'
         }
     });
 </script>
@@ -525,6 +630,116 @@ if (isset($_POST['dataBtn4'])) {
         },
         title: {
             text: 'LastPrice >500'
+        }
+    });
+</script>
+<script async>
+    Highcharts.chart('graphAllLastPrice', {
+        xAxis: {
+            categories: [<?php echo $str; ?>]
+        },
+        series: [{
+            name: 'Price',
+            data: [<?php echo join($avgSum, ', '); ?>]
+            //color: 'green'
+        }],
+        plotOptions: {
+            series: {
+                marker: {
+                    enabled: false
+                }
+            }
+        },
+        title: {
+            text: 'Последняя цена'
+        }
+    });
+</script>
+<script async>
+    Highcharts.chart('container9', {
+        data: {
+            csv: document.getElementById('data9').innerHTML
+        },
+        yAxis: {
+            title: {
+                text: 'Volume'
+            }
+        },
+        plotOptions: {
+            series: {
+                marker: {
+                    enabled: false
+                }
+            }
+        },
+        title: {
+            text: 'Volume 20 - 100'
+        }
+    });
+</script>
+<script async>
+    Highcharts.chart('container10', {
+        data: {
+            csv: document.getElementById('data10').innerHTML
+        },
+        yAxis: {
+            title: {
+                text: 'Volume'
+            }
+        },
+        plotOptions: {
+            series: {
+                marker: {
+                    enabled: false
+                }
+            }
+        },
+        title: {
+            text: 'Volume 100 - 200'
+        }
+    });
+</script>
+<script async>
+    Highcharts.chart('container11', {
+        data: {
+            csv: document.getElementById('data11').innerHTML
+        },
+        yAxis: {
+            title: {
+                text: 'Volume'
+            }
+        },
+        plotOptions: {
+            series: {
+                marker: {
+                    enabled: false
+                }
+            }
+        },
+        title: {
+            text: 'Volume 200 - 500'
+        }
+    });
+</script>
+<script async>
+    Highcharts.chart('container12', {
+        data: {
+            csv: document.getElementById('data12').innerHTML
+        },
+        yAxis: {
+            title: {
+                text: 'Volume'
+            }
+        },
+        plotOptions: {
+            series: {
+                marker: {
+                    enabled: false
+                }
+            }
+        },
+        title: {
+            text: 'Volume >500'
         }
     });
 </script>

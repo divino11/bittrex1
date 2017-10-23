@@ -28,9 +28,10 @@ foreach ($obj->result as $value) {
         $volume = sprintf('%.8f', $value->BaseVolume);
         $change = (($lastPrice / $prevDay) - 1) * 100;
         if ($prevDay != 0) {
-            if ($volume <= 100) {
+            if ($volume >= 20 && $volume <= 100) {
                 $pairName1 = $pairName;
-                echo "0 - 100 <br>";
+                $volume100 += $volume;
+                echo "20 - 100 <br>";
                 echo "Name: " . $pairName . " | ";
                 echo "Volume: " . $volume . " | ";
                 echo "Last: " . $lastPrice . " | ";
@@ -44,11 +45,12 @@ foreach ($obj->result as $value) {
                 file_put_contents($this_dir . "/json/data1.json", $res1);
                 fclose($file1);
                 unset($file1);
-                $sql1 = mysqli_query($link, "INSERT INTO `bitData` (`data1`, `changePercent1`) 
-                        VALUES ('$pairName1', '$change')");
+                $sql1 = mysqli_query($link, "INSERT INTO `bitData` (`data1`, `changePercent1`, `volume1`) 
+                        VALUES ('$pairName1', '$change', '$volume')");
                 echo "<br>";
             } elseif ($volume >= 100 && $volume <= 200) {
                 $pairName2 = $pairName;
+                $volume200 += $volume;
                 echo "100 - 200 <br>";
                 echo "Name: " . $pairName . " | ";
                 echo "Volume: " . $volume . " | ";
@@ -63,11 +65,12 @@ foreach ($obj->result as $value) {
                 file_put_contents($this_dir . "/json/data2.json", $res2);
                 fclose($file2);
                 unset($file2);
-                $sql1 = mysqli_query($link, "INSERT INTO `bitData` (`data2`, `changePercent2`) 
-                        VALUES ('$pairName2', '$change')");
+                $sql1 = mysqli_query($link, "INSERT INTO `bitData` (`data2`, `changePercent2`, `volume2`) 
+                        VALUES ('$pairName2', '$change', '$volume')");
                 echo "<br>";
             } elseif ($volume >= 200 && $volume <= 500) {
                 $pairName3 = $pairName;
+                $volume500 += $volume;
                 echo "200 - 500 <br>";
                 echo "Name: " . $pairName . " | ";
                 echo "Volume: " . $volume . " | ";
@@ -82,11 +85,12 @@ foreach ($obj->result as $value) {
                 file_put_contents($this_dir . "/json/data3.json", $res3);
                 fclose($file3);
                 unset($file3);
-                $sql1 = mysqli_query($link, "INSERT INTO `bitData` (`data3`, `changePercent3`) 
-                        VALUES ('$pairName3', '$change')");
+                $sql1 = mysqli_query($link, "INSERT INTO `bitData` (`data3`, `changePercent3`, `volume3`) 
+                        VALUES ('$pairName3', '$change', '$volume')");
                 echo "<br>";
             } elseif ($volume >= 500 && $volume <= 100000) {
                 $pairName4 = $pairName;
+                $volume1000 += $volume;
                 echo "500 - &#8734 <br>";
                 echo "Name: " . $pairName . " | ";
                 echo "Volume: " . $volume . " | ";
@@ -101,8 +105,8 @@ foreach ($obj->result as $value) {
                 file_put_contents($this_dir . "/json/data4.json", $res4);
                 fclose($file4);
                 unset($file4);
-                $sql1 = mysqli_query($link, "INSERT INTO `bitData` (`data4`, `changePercent4`) 
-                        VALUES ('$pairName4', '$change')");
+                $sql1 = mysqli_query($link, "INSERT INTO `bitData` (`data4`, `changePercent4`, `volume4`) 
+                        VALUES ('$pairName4', '$change', '$volume')");
                 echo "<br>";
             }
         }
@@ -137,6 +141,6 @@ echo "<br>avgPrice4: ";
 $avgPrice4 = $price4 / $i1000;
 echo $avgPrice4 = sprintf('%.8f', $avgPrice4);
 mysqli_set_charset($link, 'utf8');
-$sql = mysqli_query($link, "INSERT INTO `bit` (`result1`, `result2`, `result3`, `result4`, `price1`, `price2`, `price3`, `price4`) 
-                        VALUES ('$result100', '$result200', '$result500', '$result1000', '$avgPrice1', '$avgPrice2', '$avgPrice3', '$avgPrice4')");
+$sql = mysqli_query($link, "INSERT INTO `bit` (`result1`, `result2`, `result3`, `result4`, `price1`, `price2`, `price3`, `price4`, `volume1`, `volume2`, `volume3`, `volume4`) 
+                        VALUES ('$result100', '$result200', '$result500', '$result1000', '$avgPrice1', '$avgPrice2', '$avgPrice3', '$avgPrice4', '$volume100', '$volume200', '$volume500', '$volume1000')");
 ?>

@@ -21,22 +21,13 @@ if ($percent1 != null && $percent2 != null && $percent3 != null) {
     $row = mysqli_fetch_array($result);
     $sumBTC = $row['allBTC'];
     $minusBTC = ($lastCountBTC - $sumBTC) * 100;
-    /*$percentBTC = (abs(100 - $minusBTC)) / 100;
-    $percentInput1 = (100 - $percent1) / 100;
-    $percentInput2 = (100 - $percent2) / 100;
-    $percentInput3 = (100 - $percent3) / 100;
-    $percentForSell1 = $percentSell1 / 100;
-    $percentForSell2 = $percentSell2 / 100;
-    $percentForSell3 = $percentSell3 / 100;
-    $editPercent1 = $sumBTC / $percentInput1;
-    $editPercent1 = sprintf('%.8f', $editPercent1);*/
     $sql = "SELECT count1, count2, count3 FROM `bitPercent`";
     $result = mysqli_query($link, $sql);
     $row = mysqli_fetch_array($result);
     $count1 = $row['count1'];
     $count2 = $row['count2'];
     $count3 = $row['count3'];
-    if ($minusBTC >= $percent1 && $minusBTC <= $percent2 && $count1 == 0) {
+    if ($minusBTC >= $percent1 && $percent1 != 0 && $count1 == 0) {
         $this_dir = dirname(__FILE__);
         $file = fopen($this_dir . '/json/dataPercent.json', "r");
         $getJSON = stream_get_contents($file);
@@ -53,7 +44,7 @@ if ($percent1 != null && $percent2 != null && $percent3 != null) {
             }
         }
         $sql = mysqli_query($link, "UPDATE `bitPercent` SET `count1` = '1'");
-    } elseif ($minusBTC >= $percent2 && $minusBTC <= $percent3 && $count2 == 0) {
+    } elseif ($minusBTC >= $percent2 && $percent2 != 0 && $count2 == 0) {
         $this_dir = dirname(__FILE__);
         $file = fopen($this_dir . '/json/dataPercent.json', "r");
         $getJSON = stream_get_contents($file);
@@ -70,7 +61,7 @@ if ($percent1 != null && $percent2 != null && $percent3 != null) {
             }
         }
         $sql = mysqli_query($link, "UPDATE `bitPercent` SET `count2` = '1'");
-    } elseif ($minusBTC >= $percent3 && $count3 == 0) {
+    } elseif ($minusBTC >= $percent3 && $percent3 != 0 && $count3 == 0) {
         $this_dir = dirname(__FILE__);
         $file = fopen($this_dir . '/json/dataPercent.json', "r");
         $getJSON = stream_get_contents($file);

@@ -25,6 +25,16 @@ $str = "'" . implode("', '", $time) . "'";
           integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
 </head>
 <body>
+<div class="colorPairName">
+    <?php
+    $file = fopen('json/dataSelect.json', "r");
+    $getJSON = stream_get_contents($file);
+    $json = json_decode($getJSON);
+    foreach ($json as $item) {
+        echo $item . " ";
+    }
+    ?>
+</div>
 <div id="container55"></div>
 <form action="graph.php" method="post" class="formSellAll">
     <button type="submit" name="sellAll" class="btn btn-info" id="btn_sell">Продать все</button>
@@ -32,13 +42,13 @@ $str = "'" . implode("', '", $time) . "'";
 <div class="container">
     <div class="aligncenter">
         <form action="graph.php" method="post">
-            <input type="text" name="percent1" class="input_field" placeholder="Первый ордер (5)" required>
-            <input type="text" name="percent2" class="input_field" placeholder="Второй ордер (10)" required>
-            <input type="text" name="percent3" class="input_field" placeholder="Третий ордер (15)" required>
+            <input type="text" name="percent1" class="input_field" placeholder="Первый ордер (5)">
+            <input type="text" name="percent2" class="input_field" placeholder="Второй ордер (10)">
+            <input type="text" name="percent3" class="input_field" placeholder="Третий ордер (15)">
             <br><br>
-            <input type="text" name="percentSell1" class="input_field" placeholder="20" required>
-            <input type="text" name="percentSell2" class="input_field" placeholder="30" required>
-            <input type="text" name="percentSell3" class="input_field" placeholder="50" required>
+            <input type="text" name="percentSell1" class="input_field" placeholder="20">
+            <input type="text" name="percentSell2" class="input_field" placeholder="30">
+            <input type="text" name="percentSell3" class="input_field" placeholder="50">
             <br><br>
                 <button type="submit" name="mainFormBtn" class="btn btn-info">Применить</button>
 

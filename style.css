@@ -43,7 +43,7 @@ body {
     height: 45%;
     position: absolute;
     left: 0;
-    margin-top: 1px;
+    margin-top: 20px;
 }
 
 #container6 {
@@ -51,7 +51,7 @@ body {
     height: 45%;
     position: absolute;
     left: 25%;
-    margin-top: 1px;
+    margin-top: 20px;
 }
 
 #container7 {
@@ -59,14 +59,53 @@ body {
     height: 45%;
     position: absolute;
     left: 50%;
-    margin-top: 1px;
+    margin-top: 20px;
 }
 #container8 {
     width: 25%;
     height: 45%;
     position: absolute;
     left: 75%;
-    margin-top: 1px;
+    margin-top: 20px;
+}
+
+#container9 {
+    width: 25%;
+    height: 45%;
+    position: absolute;
+    left: 0;
+    margin-top: 23%;
+}
+
+#container10 {
+    width: 25%;
+    height: 45%;
+    position: absolute;
+    left: 25%;
+    margin-top: 23%;
+}
+
+#container11 {
+    width: 25%;
+    height: 45%;
+    position: absolute;
+    left: 50%;
+    margin-top: 23%;
+}
+#container12 {
+    width: 25%;
+    height: 45%;
+    position: absolute;
+    left: 75%;
+    margin-top: 23%;
+}
+
+#graphAllLastPrice  {
+    margin-top: 42%;
+}
+
+#container55 {
+    margin-top: 1%;
 }
 
 .formGraphic {
@@ -120,7 +159,7 @@ body {
 
 .namePair {
     width: 100%;
-    margin-top: 41%;
+    margin-top: 5%;
 }
 
 .col-md-3 {
