@@ -169,3 +169,16 @@ body {
 .aligncenter {
     text-align: center;
 }
+
+.colorOrder {
+    color: #fff;
+    text-align: center;
+}
+
+.start_input {
+    margin-top: 15%;
+    border: 0;
+    border-radius: 10px;
+    padding: 6px ;
+    width: 300px;
+}

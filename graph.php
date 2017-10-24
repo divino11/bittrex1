@@ -27,11 +27,13 @@ $str = "'" . implode("', '", $time) . "'";
 <body>
 <div class="colorPairName">
     <?php
-    $file = fopen('json/dataSelect.json', "r");
+    $file = fopen('json/dataPercent.json', "r");
     $getJSON = stream_get_contents($file);
     $json = json_decode($getJSON);
     foreach ($json as $item) {
-        echo $item . " ";
+        foreach ($item as $namePair => $pricePair) {
+            echo $namePair . " ";
+        }
     }
     ?>
 </div>
@@ -42,20 +44,54 @@ $str = "'" . implode("', '", $time) . "'";
 <div class="container">
     <div class="aligncenter">
         <form action="graph.php" method="post">
-            <input type="text" name="percent1" class="input_field" placeholder="Первый ордер (5)">
-            <input type="text" name="percent2" class="input_field" placeholder="Второй ордер (10)">
-            <input type="text" name="percent3" class="input_field" placeholder="Третий ордер (15)">
+            <?php
+            $sql = "SELECT * FROM `bitPercent`";
+            $result = mysqli_query($link, $sql);
+            $row = mysqli_fetch_array($result);
+            $percentF = $row['percent1'];
+            $percentS = $row['percent2'];
+            $percentT = $row['percent3'];
+            $percentSellF = $row['percentSell1'];
+            $percentSellS = $row['percentSell2'];
+            $percentSellT = $row['percentSell3'];
+            ?>
+            <input type="text" name="percent1" class="input_field" value="<?php echo $percentF; ?>" placeholder="Первый ордер (5)">
+            <input type="text" name="percent2" class="input_field" value="<?php echo $percentS; ?>" placeholder="Второй ордер (10)">
+            <input type="text" name="percent3" class="input_field" value="<?php echo $percentT; ?>" placeholder="Третий ордер (15)">
             <br><br>
-            <input type="text" name="percentSell1" class="input_field" placeholder="20">
-            <input type="text" name="percentSell2" class="input_field" placeholder="30">
-            <input type="text" name="percentSell3" class="input_field" placeholder="50">
+            <input type="text" name="percentSell1" class="input_field" value="<?php echo $percentSellF; ?>" placeholder="20">
+            <input type="text" name="percentSell2" class="input_field" value="<?php echo $percentSellS; ?>" placeholder="30">
+            <input type="text" name="percentSell3" class="input_field" value="<?php echo $percentSellT; ?>" placeholder="50">
             <br><br>
+                <button type="submit" name="cancel" class="btn btn-danger">Отменить</button>
                 <button type="submit" name="mainFormBtn" class="btn btn-info">Применить</button>
-
         </form>
     </div>
 </div>
 <?php
+require_once 'db/db.php';
+$sql1 = "SELECT * FROM `bitPercent`";
+$result1 = mysqli_query($link, $sql1);
+$row1 = mysqli_fetch_array($result1);
+$count1 = $row1['count1'];
+$count2 = $row1['count2'];
+$count3 = $row1['count3'];
+$percentSellF = $row1['percentSell1'];
+$percentSellS = $row1['percentSell2'];
+$percentSellT = $row1['percentSell3'];
+if ($count1 == 1) {
+    echo "<p class='colorOrder'>Из первого ордера было продано: " . $percentSellF . "%</p>";
+    if ($count2 == 1) {
+        echo "<p class='colorOrder'>Из второго ордера было продано: " . $percentSellS . "%</p>";
+        if ($count3 == 1) {
+            echo "<p class='colorOrder'>Из третьего ордера было продано: " . $percentSellT . "%</p>";
+        }
+    }
+}
+if (isset($_POST['cancel'])) {
+    require_once 'db/db.php';
+    $result = mysqli_query($link, "TRUNCATE TABLE `bitPercent`");
+}
 if (isset($_POST['sellAll'])) {
     require_once 'db/db.php';
     require_once 'func/functions.php';
@@ -67,14 +103,14 @@ if (isset($_POST['sellAll'])) {
     $obj = json_decode($execResult);
     foreach ($obj as $item) {
         foreach ($item as $value) {
-            if ($value->Currency != "BTC" && $value->Currency != "QTUM") {
+            if ($value->Currency != "BTC" && $value->Currency != "QTUM" && $value->Currency != "USDT") {
                 /*echo $value->Currency;
                 echo " | ";
                 echo $value->Balance;
                 echo "<br>";*/
                 $pair = "BTC-" . $value->Currency;
                 $rate = lastPrice('BTC-' . $value->Currency);
-                $price = $rate * 0.95;
+                $price = $rate * 0.98;
                 $price = sprintf('%.8f', $price);
                 $amount = $value->Available;
                 $amount = sprintf('%.8f', $amount);
